@@ -28,22 +28,23 @@
             <h2 class="separacion">Número de bombas: </h2>
             <h2 class="separacion">Posiciones de las bombas: </h2>
         </div>
+        <form action="/juego">
         <div class="col-7">
-            <form th:action="enviarDatosJuego">
-                <input class="form-control" type="text" th:name="filas">
+
+                <input class="form-control" type="text" name="filas">
                 <br>
-                <input class="form-control" type="text" th:name="columnas">
+                <input class="form-control" type="text" name="columnas">
                 <br>
-                <input class="form-control" type="text" th:name="intentos">
+                <input class="form-control" type="text" name="intentos">
                 <br>
-                <input class="form-control" type="text" th:name="bombas">
+                <input class="form-control" type="text" name="bombas">
                 <br>
-                <input class="form-control" type="text" th:name="posiciones">
-            </form>
+                <input class="form-control" type="text" name="posiciones">
         </div>
         <div>
             <button type="button" class="btn btn-primary" style="margin-top: 20px">Iniciar juego</button>
         </div>
+        </form>
     </div>
 </section>
 

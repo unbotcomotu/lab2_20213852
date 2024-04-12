@@ -18,7 +18,7 @@ public class BasicController {
         return "main";
     }
 
-    @GetMapping("/juego")
+    @GetMapping("/juegoPlantilla")
     public String juego(Model model,@RequestParam(name="cantidadFilas",required = false) Integer cantidadFilas,
                         @RequestParam(name = "cantidadColumnas",required = false) Integer cantidadColumnas,
                         @RequestParam("esPrimeraPartida")Boolean esPrimeraPartida,
@@ -166,6 +166,11 @@ public class BasicController {
 
         model.addAttribute("matrizBloques",matriz);
         return "main";
+    }
+
+    @GetMapping("/juego")
+    public String juegoMolde(){
+        return "juegoMolde";
     }
 
     private void buscarBloquesSinBomba(int fila,int columna,Bloque[][] matriz,int cantidadFilasMatriz,int cantidadColumnasMatriz){
