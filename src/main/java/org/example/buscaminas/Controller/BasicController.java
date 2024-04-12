@@ -48,7 +48,7 @@ public class BasicController {
                         matriz[i][j].setEstado("descubierto");
                         bombaEncontrada=true;
                     }else {
-                        buscarBloquesSinBomba(i,j,matriz);
+                        buscarBloquesSinBomba(i,j,matriz,cantidadFilas,cantidadColumnas);
                     }
                 }
             }
@@ -168,7 +168,7 @@ public class BasicController {
         return "main";
     }
 
-    private void buscarBloquesSinBomba(int fila,int columna,Bloque[][] matriz){
+    private void buscarBloquesSinBomba(int fila,int columna,Bloque[][] matriz,int cantidadFilasMatriz,int cantidadColumnasMatriz){
 
     }
 }
