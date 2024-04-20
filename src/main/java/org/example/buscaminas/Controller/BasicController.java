@@ -40,8 +40,8 @@ public class BasicController {
             String[] auxPosiciones=posicionesBombas.split(" ");
             cantidadBombas=auxPosiciones.length;
             ArrayList<Integer[]>posicionBomba=new ArrayList<>();
-            for(int i=0;i<auxPosiciones.length;i++){
-                Integer[] aux={Integer.parseInt(auxPosiciones[i].split(",")[0].split("")[1])-1,Integer.parseInt(auxPosiciones[i].split(",")[1].split("")[0])-1};
+            for(int i=0;i<cantidadBombas;i++){
+                Integer[] aux={Integer.parseInt(auxPosiciones[i].split(",")[0].split("\\(")[1])-1,Integer.parseInt(auxPosiciones[i].split(",")[1].split("\\)")[0])-1};
                 posicionBomba.add(aux);
             }
             for (int i=0;i<cantidadFilas;i++){
@@ -98,6 +98,9 @@ public class BasicController {
                 }
             }
         }
+        model.addAttribute("bombaEncontrada",false);
+        model.addAttribute("gano",false);
+        model.addAttribute("perdio",false);
         model.addAttribute("matriz", matriz);
         return "juego";
     }
@@ -114,8 +117,12 @@ public class BasicController {
                 bombaEncontrada=true;
                 model.addAttribute("bombaEncontrada",bombaEncontrada);
             }else {
-                matriz[coordenada[0]][coordenada[1]].setEstado("descubiertoSinBomba");
-                explotarMina(coordenada[0],coordenada[1],true);
+                if(matriz[coordenada[0]][coordenada[1]].getNumero()!=0){
+                    explotarMina(coordenada[0],coordenada[1],false);
+                }else {
+                    explotarMina(coordenada[0],coordenada[1],true);
+                }
+
             }
         }
         model.addAttribute("bombaEncontrada",bombaEncontrada);
@@ -129,61 +136,65 @@ public class BasicController {
         }else {
             model.addAttribute("gano",false);
         }
+        model.addAttribute("matriz",matriz);
+        model.addAttribute("intentos",numeroIntentos);
         return "juego";
     }
 
 
-    private void explotarMina(Integer x,Integer y,Boolean bloqueElegido){
-            matriz[x][y].setEstado("descubiertoSinBomba");
-            bloquesDescubiertos++;
-            if(x==0&y==0){
-                if(!matriz[x+1][y].isTieneBomba()&&matriz[x+1][y].getEstado().equals("sinExplorar")){
-                    explotarMina(x+1,y,false);
+    private void explotarMina(Integer x,Integer y,Boolean aux){
+
+                matriz[x][y].setEstado("descubiertoSinBomba");
+                bloquesDescubiertos++;
+                if(x>0){
+                    Bloque bloque=matriz[x-1][y];
+                    if(!bloque.isTieneBomba()&bloque.getEstado().equals("sinExplorar")){
+                        if(bloque.getNumero()!=0){
+                            if(aux){
+                                explotarMina(x-1,y,false);
+                            }
+                        }else {
+                            explotarMina(x-1,y,true);
+                        }
+                    }
                 }
-                if(!matriz[x][y+1].isTieneBomba()&&matriz[x][y+1].getEstado().equals("sinExplorar")){
-                    explotarMina(x,y+1,false);
+                if(y<columnas-1){
+                    Bloque bloque=matriz[x][y+1];
+                    if(!bloque.isTieneBomba()&&bloque.getEstado().equals("sinExplorar")){
+                        if(bloque.getNumero()!=0){
+                            if(aux){
+                                explotarMina(x,y+1,false);
+                            }
+                        }else {
+                            explotarMina(x,y+1,true);
+                        }
+
+                    }
                 }
-            }else if(x==filas-1&&y==columnas-1){
-                if(!matriz[x-1][y].isTieneBomba()&&matriz[x-1][y].getEstado().equals("sinExplorar")){
-                    explotarMina(x-1,y,false);
+                if(y>0){
+                    Bloque bloque=matriz[x][y-1];
+                    if(!bloque.isTieneBomba()&&matriz[x][y-1].getEstado().equals("sinExplorar")){
+                        if(bloque.getNumero()!=0){
+                            if(aux){
+                                explotarMina(x,y-1,false);
+                            }
+                        }else {
+                            explotarMina(x,y-1,true);
+                        }
+                    }
                 }
-                if(!matriz[x][y-1].isTieneBomba()&&matriz[x][y-1].getEstado().equals("sinExplorar")){
-                    explotarMina(x,y-1,false);
+                if(x<filas-1){
+                    Bloque bloque=matriz[x+1][y];
+                    if(!bloque.isTieneBomba()&&bloque.getEstado().equals("sinExplorar")){
+                        if(bloque.getNumero()!=0){
+                            if(aux){
+                                explotarMina(x+1,y,false);
+                            }
+                        }else {
+                            explotarMina(x+1,y,true);
+                        }
+                    }
                 }
-            }else if(x==0){
-                if(!matriz[x+1][y].isTieneBomba()&&matriz[x+1][y].getEstado().equals("sinExplorar")){
-                    explotarMina(x+1,y,false);
-                }
-                if(!matriz[x][y+1].isTieneBomba()&&matriz[x][y+1].getEstado().equals("sinExplorar")){
-                    explotarMina(x,y+1,false);
-                }
-                if(!matriz[x][y-1].isTieneBomba()&&matriz[x][y-1].getEstado().equals("sinExplorar")){
-                    explotarMina(x,y-1,false);
-                }
-            }else if(y==0){
-                if(!matriz[x][y+1].isTieneBomba()&&matriz[x][y+1].getEstado().equals("sinExplorar")){
-                    explotarMina(x+1,y,false);
-                }
-                if(!matriz[x+1][y].isTieneBomba()&&matriz[x+1][y].getEstado().equals("sinExplorar")){
-                    explotarMina(x+1,y,false);
-                }
-                if(!matriz[x-1][y].isTieneBomba()&&matriz[x-1][y].getEstado().equals("sinExplorar")){
-                    explotarMina(x-1,y,false);
-                }
-            }else {
-                if(!matriz[x][y-1].isTieneBomba()&&matriz[x][y-1].getEstado().equals("sinExplorar")){
-                    explotarMina(x-1,y,false);
-                }
-                if(!matriz[x][y+1].isTieneBomba()&&matriz[x][y+1].getEstado().equals("sinExplorar")){
-                    explotarMina(x+1,y,false);
-                }
-                if(!matriz[x+1][y].isTieneBomba()&&matriz[x+1][y].getEstado().equals("sinExplorar")){
-                    explotarMina(x+1,y,false);
-                }
-                if(!matriz[x-1][y].isTieneBomba()&&matriz[x-1][y].getEstado().equals("sinExplorar")){
-                    explotarMina(x-1,y,false);
-                }
-            }
 
     }
 }

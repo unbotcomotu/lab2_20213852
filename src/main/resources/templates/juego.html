@@ -19,11 +19,14 @@
     .sinExplorar{
       background: #72cbe0;
     }
-    .exploradoSinBomba{
+    .descubiertoSinBomba{
       background: #48c249;
     }
-    .exploradoConBomba{
-      background: #c467f6;
+    .descubiertoConBomba{
+      background-image: url('../static/mina.png') !important;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
     }
   </style>
 </head>
@@ -33,14 +36,19 @@
   <h1>Encuentre todo el cobre para ganar el juego</h1>
   <div class="row">
     <div class="row">
-        <span>Coordenada a explotar de la mina: <form th:href="@{'/minar'}" action="get"><input class="form-control" type="text"><button type="submit" style="margin-left: 20px" class="btn btn-primary">Explotar</button></form></span>
+        <div>Coordenada a explotar de la mina:
+          <form th:action="@{'/minar'}" method="get">
+            <input name="coordenada" class="form-control" type="text">
+            <button type="submit" th:disabled="${perdio or gano}" style="margin-left: 20px" class="btn btn-primary">Explotar</button>
+          </form>
+        </div>
     </div>
-    <div th:each="fila:${matriz}">
-      <div th:each="bloque:${fila}" class="row" style="margin-left: 30px">
-        <div class="bloque" th:classappend="${bloque.estado}" th:text="${bloque.numero!=0&&bloque.estado=='sinExplorar' ? bloque.numero :''}"></div>
+      <div th:each="fila:${matriz}" class="row" style="margin-left: 30px">
+        <div class="bloque" th:each="bloque:${fila}" th:classappend="${bloque.estado}" th:text="${bloque.numero!=0&&bloque.estado=='descubiertoSinBomba' ? bloque.numero :''}"></div>
       </div>
-    </div>
-
+      <h3 style="font-weight: bold" th:if="${bombaEncontrada and !perdio}" th:text="|Encontró una bomba, le queda(n) ${intentos}|"></h3>
+      <h3 style="font-weight: bold" th:if="${perdio}" th:text="|Usted ha perdido el juego !|"></h3>
+      <h3 style="font-weight: bold" th:if="${gano}" th:text="|Usted ha ganado el juego !|"></h3>
   </div>
 </section>
 
