@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Bloque {
-    private String estado;
-    private int numero;
-    private boolean tieneBomba;
+    private String estado="sinExplorar";
+    private int numero=0;
+    private boolean tieneBomba=false;
 
     public Bloque() {
     }
@@ -18,4 +18,5 @@ public class Bloque {
         this.numero = numero;
         this.tieneBomba = tieneBomba;
     }
+
 }

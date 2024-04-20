@@ -10,170 +10,180 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static java.lang.Integer.parseInt;
+
 @Controller
 public class BasicController {
 
+
+    private Bloque[][]matriz;
+    private Integer numeroIntentos;
+    private Integer bloquesDescubiertos;
+    private Integer filas;
+    private Integer columnas;
+    private Integer cantidadBombas;
     @GetMapping("/buscaminas")
     public String inicio(){
         return "main";
     }
 
-    @GetMapping("/juegoPlantilla")
-    public String juego(Model model,@RequestParam(name="cantidadFilas",required = false) Integer cantidadFilas,
-                        @RequestParam(name = "cantidadColumnas",required = false) Integer cantidadColumnas,
-                        @RequestParam("esPrimeraPartida")Boolean esPrimeraPartida,
-                        @RequestParam("matrizActual")Bloque[][] matrizActual,
-                        @RequestParam("filaEscogida") Integer filaEscogida,
-                        @RequestParam("columnaEscogida") Integer columnaEscogida){
-        Bloque[][] matriz=new Bloque[cantidadFilas][cantidadColumnas];
-        if(esPrimeraPartida){
+    @GetMapping("/jugar")
+    public String juego(Model model,@RequestParam(name="filas") Integer cantidadFilas,
+                        @RequestParam(name = "columnas") Integer cantidadColumnas,
+                        @RequestParam(name = "intentos")Integer numero,
+                        @RequestParam(name = "posiciones") String posicionesBombas){
             matriz=new Bloque[cantidadFilas][cantidadColumnas];
+            numeroIntentos=numero;
+            bloquesDescubiertos=0;
+            columnas=cantidadColumnas;
+            filas=cantidadFilas;
+            String[] auxPosiciones=posicionesBombas.split(" ");
+            cantidadBombas=auxPosiciones.length;
+            ArrayList<Integer[]>posicionBomba=new ArrayList<>();
+            for(int i=0;i<auxPosiciones.length;i++){
+                Integer[] aux={Integer.parseInt(auxPosiciones[i].split(",")[0].split("")[1])-1,Integer.parseInt(auxPosiciones[i].split(",")[1].split("")[0])-1};
+                posicionBomba.add(aux);
+            }
             for (int i=0;i<cantidadFilas;i++){
                 for(int j=0;j<cantidadColumnas;j++){
-                    matrizActual[i][j].setEstado("sinExplorar");
-                    Integer numeroRandom1=new Random().nextInt(cantidadFilas*cantidadColumnas);
-                    if (numeroRandom1<cantidadColumnas*cantidadFilas*0.05){
-                        matrizActual[i][j].setTieneBomba(true);
+                    matriz[i][j]=new Bloque();
+                    for(int k=0;k<posicionBomba.size();k++){
+                        if(i==posicionBomba.get(k)[0]&&j==posicionBomba.get(k)[1]){
+                            matriz[i][j].setTieneBomba(true);
+                        }
                     }
                 }
             }
-        }else {
-            matriz=matrizActual;
+        for(int i=0;i<filas;i++) {
+            for (int j = 0; j < columnas; j++) {
+                if (i > 0 && j > 0) {
+                    if (matriz[i - 1][j - 1].isTieneBomba()) {
+                        matriz[i][j].setNumero(matriz[i][j].getNumero() + 1);
+                    }
+                }
+                if (i > 0) {
+                    if (matriz[i - 1][j].isTieneBomba()) {
+                        matriz[i][j].setNumero(matriz[i][j].getNumero() + 1);
+                    }
+                }
+                if (i > 0 && j < columnas - 1) {
+                    if (matriz[i - 1][j + 1].isTieneBomba()) {
+                        matriz[i][j].setNumero(matriz[i][j].getNumero() + 1);
+                    }
+                }
+                if (j > 0) {
+                    if (matriz[i][j - 1].isTieneBomba()) {
+                        matriz[i][j].setNumero(matriz[i][j].getNumero() + 1);
+                    }
+                }
+                if (j < columnas - 1) {
+                    if (matriz[i][j + 1].isTieneBomba()) {
+                        matriz[i][j].setNumero(matriz[i][j].getNumero() + 1);
+                    }
+                }
+                if (j > 0 && i < filas - 1) {
+                    if (matriz[i + 1][j - 1].isTieneBomba()) {
+                        matriz[i][j].setNumero(matriz[i][j].getNumero() + 1);
+                    }
+                }
+                if (i < filas - 1) {
+                    if (matriz[i + 1][j].isTieneBomba()) {
+                        matriz[i][j].setNumero(matriz[i][j].getNumero() + 1);
+                    }
+                }
+                if (j < columnas - 1 && i < filas - 1) {
+                    if (matriz[i + 1][j + 1].isTieneBomba()) {
+                        matriz[i][j].setNumero(matriz[i][j].getNumero() + 1);
+                    }
+                }
+            }
         }
+        model.addAttribute("matriz", matriz);
+        return "juego";
+    }
+
+    @GetMapping("/minar")
+    public String minar(Model model,
+                        @RequestParam(value = "coordenada")String coordenadaAux){
+        Integer[]coordenada={Integer.parseInt(coordenadaAux.split(" ")[0])-1,Integer.parseInt(coordenadaAux.split(" ")[1])-1};
         Boolean bombaEncontrada=false;
-        for(int i=0;i<cantidadFilas;i++){
-            for(int j=0;j<cantidadColumnas;j++){
-                if(i==filaEscogida&&j==columnaEscogida){
-                    if(matriz[i][j].isTieneBomba()&&matriz[i][j].getEstado().equals("sinExplorar")){
-                        matriz[i][j].setEstado("descubierto");
-                        bombaEncontrada=true;
-                    }else {
-                        buscarBloquesSinBomba(i,j,matriz,cantidadFilas,cantidadColumnas);
-                    }
-                }
+        if(matriz[coordenada[0]][coordenada[1]].getEstado().equals("sinExplorar")){
+            if(matriz[coordenada[0]][coordenada[1]].isTieneBomba()){
+                matriz[coordenada[0]][coordenada[1]].setEstado("descubiertoConBomba");
+                numeroIntentos--;
+                bombaEncontrada=true;
+                model.addAttribute("bombaEncontrada",bombaEncontrada);
+            }else {
+                matriz[coordenada[0]][coordenada[1]].setEstado("descubiertoSinBomba");
+                explotarMina(coordenada[0],coordenada[1],true);
             }
         }
-        Bloque[][] nuevaMatriz=new Bloque[cantidadFilas][cantidadColumnas];
-        Integer cantidadBombasAlrededor=0;
-        for (int i=0;i<cantidadFilas;i++){
-            for(int j=0;j<cantidadColumnas;j++){
-                if(j==0){
-                    if(i==0){
-                        if(matriz[i+1][j].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i+1][j+1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i][j+1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                    }else if(i==cantidadFilas-1){
-                        if(matriz[i-1][j].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i-1][j+1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i][j+1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                    }else {
-                        if(matriz[i-1][j].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i+1][j].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i-1][j+1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i][j+1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i+1][j+1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                    }
-                }else if(j==cantidadColumnas-1){
-                    if(i==0){
-                        if(matriz[i+1][j].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i+1][j-1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i][j-1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                    }else if(i==cantidadFilas-1){
-                        if(matriz[i-1][j].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i-1][j-1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i][j-1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                    }else {
-                        if(matriz[i-1][j].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if (matriz[i+1][j].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i-1][j-1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if(matriz[i][j-1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                        if (matriz[i+1][j-1].isTieneBomba()){
-                            cantidadBombasAlrededor++;
-                        }
-                    }
-                }else {
-                    if(matriz[i+1][j].isTieneBomba()){
-                        cantidadBombasAlrededor++;
-                    }
-                    if(matriz[i+1][j+1].isTieneBomba()){
-                        cantidadBombasAlrededor++;
-                    }
-                    if (matriz[i+1][j-1].isTieneBomba()){
-                        cantidadBombasAlrededor++;
-                    }
-                    if(matriz[i-1][j].isTieneBomba()){
-                        cantidadBombasAlrededor++;
-                    }
-                    if(matriz[i-1][j+1].isTieneBomba()){
-                        cantidadBombasAlrededor++;
-                    }
-                    if(matriz[i-1][j-1].isTieneBomba()){
-                        cantidadBombasAlrededor++;
-                    }
-                    if(matriz[i][j+1].isTieneBomba()){
-                        cantidadBombasAlrededor++;
-                    }
-                    if(matriz[i][j-1].isTieneBomba()){
-                        cantidadBombasAlrededor++;
-                    }
-                }
-                matriz[i][j].setNumero(cantidadBombasAlrededor);
-                cantidadBombasAlrededor=0;
-            }
+        model.addAttribute("bombaEncontrada",bombaEncontrada);
+        if(numeroIntentos==0){
+            model.addAttribute("perdio",true);
+        }else{
+            model.addAttribute("perdio",false);
         }
-
-        model.addAttribute("matrizBloques",matriz);
-        return "main";
+        if(bloquesDescubiertos==filas*columnas-cantidadBombas){
+            model.addAttribute("gano",true);
+        }else {
+            model.addAttribute("gano",false);
+        }
+        return "juego";
     }
 
-    @GetMapping("/juego")
-    public String juegoMolde(){
-        return "juegoMolde";
-    }
 
-    private void buscarBloquesSinBomba(int fila,int columna,Bloque[][] matriz,int cantidadFilasMatriz,int cantidadColumnasMatriz){
+    private void explotarMina(Integer x,Integer y,Boolean bloqueElegido){
+            matriz[x][y].setEstado("descubiertoSinBomba");
+            bloquesDescubiertos++;
+            if(x==0&y==0){
+                if(!matriz[x+1][y].isTieneBomba()&&matriz[x+1][y].getEstado().equals("sinExplorar")){
+                    explotarMina(x+1,y,false);
+                }
+                if(!matriz[x][y+1].isTieneBomba()&&matriz[x][y+1].getEstado().equals("sinExplorar")){
+                    explotarMina(x,y+1,false);
+                }
+            }else if(x==filas-1&&y==columnas-1){
+                if(!matriz[x-1][y].isTieneBomba()&&matriz[x-1][y].getEstado().equals("sinExplorar")){
+                    explotarMina(x-1,y,false);
+                }
+                if(!matriz[x][y-1].isTieneBomba()&&matriz[x][y-1].getEstado().equals("sinExplorar")){
+                    explotarMina(x,y-1,false);
+                }
+            }else if(x==0){
+                if(!matriz[x+1][y].isTieneBomba()&&matriz[x+1][y].getEstado().equals("sinExplorar")){
+                    explotarMina(x+1,y,false);
+                }
+                if(!matriz[x][y+1].isTieneBomba()&&matriz[x][y+1].getEstado().equals("sinExplorar")){
+                    explotarMina(x,y+1,false);
+                }
+                if(!matriz[x][y-1].isTieneBomba()&&matriz[x][y-1].getEstado().equals("sinExplorar")){
+                    explotarMina(x,y-1,false);
+                }
+            }else if(y==0){
+                if(!matriz[x][y+1].isTieneBomba()&&matriz[x][y+1].getEstado().equals("sinExplorar")){
+                    explotarMina(x+1,y,false);
+                }
+                if(!matriz[x+1][y].isTieneBomba()&&matriz[x+1][y].getEstado().equals("sinExplorar")){
+                    explotarMina(x+1,y,false);
+                }
+                if(!matriz[x-1][y].isTieneBomba()&&matriz[x-1][y].getEstado().equals("sinExplorar")){
+                    explotarMina(x-1,y,false);
+                }
+            }else {
+                if(!matriz[x][y-1].isTieneBomba()&&matriz[x][y-1].getEstado().equals("sinExplorar")){
+                    explotarMina(x-1,y,false);
+                }
+                if(!matriz[x][y+1].isTieneBomba()&&matriz[x][y+1].getEstado().equals("sinExplorar")){
+                    explotarMina(x+1,y,false);
+                }
+                if(!matriz[x+1][y].isTieneBomba()&&matriz[x+1][y].getEstado().equals("sinExplorar")){
+                    explotarMina(x+1,y,false);
+                }
+                if(!matriz[x-1][y].isTieneBomba()&&matriz[x-1][y].getEstado().equals("sinExplorar")){
+                    explotarMina(x-1,y,false);
+                }
+            }
 
     }
 }

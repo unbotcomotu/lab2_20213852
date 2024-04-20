@@ -19,10 +19,10 @@
     .sinExplorar{
       background: #72cbe0;
     }
-    .explorado{
+    .exploradoSinBomba{
       background: #48c249;
     }
-    .bomba{
+    .exploradoConBomba{
       background: #c467f6;
     }
   </style>
@@ -33,53 +33,12 @@
   <h1>Encuentre todo el cobre para ganar el juego</h1>
   <div class="row">
     <div class="row">
-        <span>Coordenada a explotar de la mina: <label for=""><input class="form-control" type="text"></label><button style="margin-left: 20px" class="btn btn-primary">Explotar</button></span>
+        <span>Coordenada a explotar de la mina: <form th:href="@{'/minar'}" action="get"><input class="form-control" type="text"><button type="submit" style="margin-left: 20px" class="btn btn-primary">Explotar</button></form></span>
     </div>
-    <div th:each="fila:${filas}" th:object="bloque.estado">
-      <div th:each="columna:${columnas}" class="row" style="margin-left: 30px">
-        <div class="bloque" th:classappend="${}"></div>
+    <div th:each="fila:${matriz}">
+      <div th:each="bloque:${fila}" class="row" style="margin-left: 30px">
+        <div class="bloque" th:classappend="${bloque.estado}" th:text="${bloque.numero!=0&&bloque.estado=='sinExplorar' ? bloque.numero :''}"></div>
       </div>
-    </div>
-
-    <div class="row" style="margin-left: 30px">
-      <div class="bloque explorado">1</div>
-      <div class="bloque explorado">1</div>
-      <div class="bloque explorado">1</div>
-      <div class="bloque explorado"></div>
-      <div class="bloque explorado"></div>
-      <div class="bloque explorado"></div>
-    </div>
-    <div class="row" style="margin-left: 30px">
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque explorado">1</div>
-      <div class="bloque explorado">1</div>
-      <div class="bloque explorado">2</div>
-      <div class="bloque explorado">2</div>
-    </div>
-    <div class="row" style="margin-left: 30px">
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-    </div>
-    <div class="row" style="margin-left: 30px">
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque explorado">3</div>
-      <div class="bloque explorado">2</div>
-    </div>
-    <div class="row" style="margin-left: 30px">
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque sinExplorar"></div>
-      <div class="bloque explorado">1</div>
-      <div class="bloque explorado"></div>
     </div>
 
   </div>

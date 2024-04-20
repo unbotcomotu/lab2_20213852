@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -20,7 +20,7 @@
 
 <section>
 <h1>STF GAMES: El juego de las minas explosivas</h1>
-    <div class="row">
+    <div class="row" style="width: 50%">
         <div class="col-5">
             <h2 class="separacion">Número de filas: </h2>
             <h2 class="separacion">Número de columnas: </h2>
@@ -28,9 +28,8 @@
             <h2 class="separacion">Número de bombas: </h2>
             <h2 class="separacion">Posiciones de las bombas: </h2>
         </div>
-        <form action="/juego">
         <div class="col-7">
-
+        <form th:action="@{'/jugar'}" method="get">
                 <input class="form-control" type="text" name="filas">
                 <br>
                 <input class="form-control" type="text" name="columnas">
@@ -40,11 +39,11 @@
                 <input class="form-control" type="text" name="bombas">
                 <br>
                 <input class="form-control" type="text" name="posiciones">
-        </div>
-        <div>
-            <button type="button" class="btn btn-primary" style="margin-top: 20px">Iniciar juego</button>
-        </div>
+                <div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 20px">Iniciar juego</button>
+                </div>
         </form>
+        </div>
     </div>
 </section>
 
