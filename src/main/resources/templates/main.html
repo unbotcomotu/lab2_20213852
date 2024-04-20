@@ -7,11 +7,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <style>
         input{
-            background: #a3c0ee;
-            margin-top: 30px;
-        }
-        .separacion{
             margin-top: 20px;
+        }
+
+        .numero{
+            background: #e1ecfc !important;
+            width: 125px;
+        }
+
+        .separacion{
+            margin-top: 29px;
             font-weight: lighter;
         }
     </style>
@@ -22,26 +27,21 @@
 <h1>STF GAMES: El juego de las minas explosivas</h1>
     <div class="row" style="width: 50%">
         <div class="col-5">
-            <h2 class="separacion">Número de filas: </h2>
-            <h2 class="separacion">Número de columnas: </h2>
-            <h2 class="separacion">Número de intentos: </h2>
-            <h2 class="separacion">Número de bombas: </h2>
-            <h2 class="separacion">Posiciones de las bombas: </h2>
+            <h4 class="separacion">Número de filas: </h4>
+            <h4 class="separacion">Número de columnas: </h4>
+            <h4 class="separacion">Número de intentos: </h4>
+            <h4 class="separacion">Número de bombas: </h4>
+            <h4 class="separacion">Posiciones de las bombas: </h4>
         </div>
         <div class="col-7">
-        <form th:action="@{'/jugar'}" method="get">
-                <input class="form-control" type="text" name="filas">
-                <br>
-                <input class="form-control" type="text" name="columnas">
-                <br>
-                <input class="form-control" type="text" name="intentos">
-                <br>
-                <input class="form-control" type="text" name="bombas">
-                <br>
+        <form th:action="@{'/jugar'}" style="margin-top: 30px" method="get">
+                <input class="form-control numero" type="text" name="filas">
+                <input class="form-control numero" type="text" name="columnas">
+                <input class="form-control numero" type="text" name="intentos">
+                <input class="form-control numero" type="text" name="bombas">
                 <input class="form-control" type="text" name="posiciones">
-                <div>
                     <button type="submit" class="btn btn-primary" style="margin-top: 20px">Iniciar juego</button>
-                </div>
+
         </form>
         </div>
     </div>

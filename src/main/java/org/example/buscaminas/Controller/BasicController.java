@@ -40,20 +40,22 @@ public class BasicController {
             String[] auxPosiciones=posicionesBombas.split(" ");
             cantidadBombas=auxPosiciones.length;
             ArrayList<Integer[]>posicionBomba=new ArrayList<>();
+            //Inicializar posiciones de bombas
             for(int i=0;i<cantidadBombas;i++){
                 Integer[] aux={Integer.parseInt(auxPosiciones[i].split(",")[0].split("\\(")[1])-1,Integer.parseInt(auxPosiciones[i].split(",")[1].split("\\)")[0])-1};
                 posicionBomba.add(aux);
             }
+            //Inicializar matriz
             for (int i=0;i<cantidadFilas;i++){
                 for(int j=0;j<cantidadColumnas;j++){
                     matriz[i][j]=new Bloque();
-                    for(int k=0;k<posicionBomba.size();k++){
-                        if(i==posicionBomba.get(k)[0]&&j==posicionBomba.get(k)[1]){
-                            matriz[i][j].setTieneBomba(true);
-                        }
-                    }
                 }
             }
+            //Insertar bombas
+            for(int k=0;k<posicionBomba.size();k++){
+                    matriz[posicionBomba.get(k)[0]][posicionBomba.get(k)[1]].setTieneBomba(true);
+            }
+            //Calcular las bombas alrededor
         for(int i=0;i<filas;i++) {
             for (int j = 0; j < columnas; j++) {
                 if (i > 0 && j > 0) {
@@ -118,11 +120,11 @@ public class BasicController {
                 model.addAttribute("bombaEncontrada",bombaEncontrada);
             }else {
                 if(matriz[coordenada[0]][coordenada[1]].getNumero()!=0){
-                    explotarMina(coordenada[0],coordenada[1],false);
+                    matriz[coordenada[0]][coordenada[1]].setEstado("descubiertoSinBomba");
+                    bloquesDescubiertos++;
                 }else {
                     explotarMina(coordenada[0],coordenada[1],true);
                 }
-
             }
         }
         model.addAttribute("bombaEncontrada",bombaEncontrada);
@@ -146,6 +148,18 @@ public class BasicController {
 
                 matriz[x][y].setEstado("descubiertoSinBomba");
                 bloquesDescubiertos++;
+                if(x>0&&y>0){
+                    Bloque bloque=matriz[x-1][y-1];
+                    if(!bloque.isTieneBomba()&bloque.getEstado().equals("sinExplorar")){
+                        if(bloque.getNumero()!=0){
+                            if(aux){
+                                explotarMina(x-1,y-1,false);
+                            }
+                        }else {
+                            explotarMina(x-1,y-1,true);
+                        }
+                    }
+                }
                 if(x>0){
                     Bloque bloque=matriz[x-1][y];
                     if(!bloque.isTieneBomba()&bloque.getEstado().equals("sinExplorar")){
@@ -155,6 +169,54 @@ public class BasicController {
                             }
                         }else {
                             explotarMina(x-1,y,true);
+                        }
+                    }
+                }
+                if(x>0&&y<columnas-1){
+                    Bloque bloque=matriz[x-1][y+1];
+                    if(!bloque.isTieneBomba()&bloque.getEstado().equals("sinExplorar")){
+                        if(bloque.getNumero()!=0){
+                            if(aux){
+                                explotarMina(x-1,y+1,false);
+                            }
+                        }else {
+                            explotarMina(x-1,y+1,true);
+                        }
+                    }
+                }
+                if(x<filas-1&&y>0){
+                    Bloque bloque=matriz[x+1][y-1];
+                    if(!bloque.isTieneBomba()&bloque.getEstado().equals("sinExplorar")){
+                        if(bloque.getNumero()!=0){
+                            if(aux){
+                                explotarMina(x+1,y-1,false);
+                            }
+                        }else {
+                            explotarMina(x+1,y-1,true);
+                        }
+                    }
+                }
+                if(x<filas-1){
+                    Bloque bloque=matriz[x+1][y];
+                    if(!bloque.isTieneBomba()&bloque.getEstado().equals("sinExplorar")){
+                        if(bloque.getNumero()!=0){
+                            if(aux){
+                                explotarMina(x+1,y,false);
+                            }
+                        }else {
+                            explotarMina(x+1,y,true);
+                        }
+                    }
+                }
+                if(x<filas-1&&y<columnas-1){
+                    Bloque bloque=matriz[x+1][y+1];
+                    if(!bloque.isTieneBomba()&bloque.getEstado().equals("sinExplorar")){
+                        if(bloque.getNumero()!=0){
+                            if(aux){
+                                explotarMina(x+1,y+1,false);
+                            }
+                        }else {
+                            explotarMina(x+1,y+1,true);
                         }
                     }
                 }
@@ -180,18 +242,6 @@ public class BasicController {
                             }
                         }else {
                             explotarMina(x,y-1,true);
-                        }
-                    }
-                }
-                if(x<filas-1){
-                    Bloque bloque=matriz[x+1][y];
-                    if(!bloque.isTieneBomba()&&bloque.getEstado().equals("sinExplorar")){
-                        if(bloque.getNumero()!=0){
-                            if(aux){
-                                explotarMina(x+1,y,false);
-                            }
-                        }else {
-                            explotarMina(x+1,y,true);
                         }
                     }
                 }
